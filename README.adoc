@@ -1,0 +1,28 @@
+= libchrony
+
+`libchrony` is a C library for monitoring `chronyd`. It communicates with
+`chronyd` directly over Unix domain or UDP socket, not relying on `chronyc`.
+
+See `example-reports.c` for an example application printing all data from all
+supported reports.
+
+== Requirements
+
+- C compiler
+- GNU make
+- libtool
+
+== Building and installation
+
+```
+$ make
+# make install prefix=/usr/local
+```
+
+== Author
+
+Miroslav Lichvar <mlichvar@redhat.com>
+
+== License
+
+LGPL-2.1-or-later
