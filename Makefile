@@ -21,11 +21,11 @@ all: $(lib) $(examples)
 	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(CFLAGS) -c $<
 
 $(lib): client.lo message.lo
-	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -version-info $(lib_version) \
+	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -version-info $(lib_version) \
 		-rpath $(libdir) -o $@ $^ $(LDFLAGS)
 
 example-reports: example-reports.o $(lib)
-	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 install: $(lib)
 	mkdir -p $(libdir) $(includedir)
