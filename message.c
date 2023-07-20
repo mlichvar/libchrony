@@ -502,6 +502,7 @@ struct timespec get_field_timespec(const Message *msg, int field) {
 		ts.tv_nsec = ntohl(*(uint32_t *)(data + 8));
 		break;
 	default:
+		break;
 	}
 
 	return ts;
