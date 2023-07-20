@@ -1,4 +1,7 @@
 *.o
+*.la
 *.lo
 .deps
 .libs
+.vimrc
+example-reports
