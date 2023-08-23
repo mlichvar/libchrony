@@ -258,9 +258,9 @@ int main() {
 	if (fd < 0)
 		return 1;
 
-	if (chrony_session_init(&s, fd) == CHRONY_OK) {
+	if (chrony_init_session(&s, fd) == CHRONY_OK) {
 		print_all_reports(s);
-		chrony_session_deinit(s);
+		chrony_deinit_session(s);
 	} else {
 		r = 1;
 	}

@@ -47,8 +47,8 @@ typedef struct chrony_session_t chrony_session;
 
 const char *chrony_get_error_string(chrony_err);
 
-chrony_err chrony_session_init(chrony_session **s, int fd);
-void chrony_session_deinit(chrony_session *s);
+chrony_err chrony_init_session(chrony_session **s, int fd);
+void chrony_deinit_session(chrony_session *s);
 
 int chrony_get_fd(chrony_session *s);
 

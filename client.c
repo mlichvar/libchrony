@@ -69,7 +69,7 @@ const char *chrony_get_error_string(chrony_err e) {
 	return strings[e];
 }
 
-chrony_err chrony_session_init(chrony_session **s, int fd) {
+chrony_err chrony_init_session(chrony_session **s, int fd) {
 	chrony_session *session;
 
 	session = malloc(sizeof (*session));
@@ -90,7 +90,7 @@ chrony_err chrony_session_init(chrony_session **s, int fd) {
 	return CHRONY_OK;
 }
 
-void chrony_session_deinit(chrony_session *s) {
+void chrony_deinit_session(chrony_session *s) {
 	fclose(s->urandom);
 	free(s);
 }
