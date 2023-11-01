@@ -27,6 +27,9 @@ extern "C" {
 #include <stdint.h>
 #include <time.h>
 
+int chrony_open_socket(const char *address);
+void chrony_close_socket(int fd);
+
 typedef enum {
 	CHRONY_OK = 0,
 	CHRONY_NO_MEMORY,

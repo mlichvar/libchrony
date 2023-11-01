@@ -20,7 +20,7 @@ all: $(lib) $(examples)
 %.lo: %.c
 	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(CFLAGS) -c $<
 
-$(lib): client.lo message.lo
+$(lib): client.lo message.lo socket.lo
 	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -version-info $(lib_version) \
 		-rpath $(libdir) -o $@ $^ $(LDFLAGS)
 
