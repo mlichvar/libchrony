@@ -19,78 +19,8 @@
 #include "chrony.h"
 
 #include <inttypes.h>
-#include <netinet/ip.h>
 #include <poll.h>
 #include <stdio.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <unistd.h>
-
-static int connect_unix(void) {
-	struct sockaddr_un addr;
-	int fd;
-
-	addr.sun_family = AF_UNIX;
-	snprintf(addr.sun_path, sizeof (addr.sun_path), "%s.%d",
-		 "/var/run/chrony/example-reports.sock", (int)getpid());
-
-	fd = socket(AF_UNIX, SOCK_DGRAM, 0);
-	if (fd < 0) {
-		perror("socket unix");
-		return -1;
-	}
-
-	unlink(addr.sun_path);
-	if (bind(fd, (struct sockaddr *)&addr, sizeof (addr)) < 0) {
-		perror("bind unix");
-		return -1;
-	}
-	chmod(addr.sun_path, 0666);
-
-	snprintf(addr.sun_path, sizeof (addr.sun_path), "%s",
-		 "/var/run/chrony/chronyd.sock");
-
-	if (connect(fd, (struct sockaddr *)&addr, sizeof (addr)) < 0) {
-		perror("connect unix");
-		return -1;
-	}
-
-	return fd;
-}
-
-static void remove_unix(int fd) {
-	struct sockaddr_un addr;
-	socklen_t len;
-
-	len = sizeof (addr);
-	if (getsockname(fd, (struct sockaddr *)&addr, &len) == 0 &&
-	    addr.sun_family == AF_UNIX && len <= sizeof (addr)) {
-		unlink(addr.sun_path);
-	}
-}
-
-static int connect_inet(void) {
-	struct sockaddr_in addr;
-	int fd;
-
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	addr.sin_port = htons(323);
-
-	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (fd < 0) {
-		perror("socket inet");
-		return -1;
-	}
-
-	if (connect(fd, (struct sockaddr *)&addr, sizeof (addr)) < 0) {
-		perror("connect inet");
-		return -1;
-	}
-
-	return fd;
-}
 
 static chrony_err process_responses(chrony_session *s) {
 	struct pollfd pfd = { .fd = chrony_get_fd(s), .events = POLLIN };
@@ -190,6 +120,9 @@ static int print_report(chrony_session *s, int report_index) {
 							printf("%s ", str);
 					}
 					break;
+				case CHRONY_CONTENT_BOOLEAN:
+					printf(uval ? "Yes" : "No");
+					break;
 				default:
 					printf("%"PRIu64, uval);
 				}
@@ -227,6 +160,12 @@ static int print_report(chrony_session *s, int report_index) {
 			case CHRONY_CONTENT_MEASURE_PPM:
 				printf(" ppm");
 				break;
+			case CHRONY_CONTENT_LENGTH_BITS:
+				printf(" bits");
+				break;
+			case CHRONY_CONTENT_LENGTH_BYTES:
+				printf(" bytes");
+				break;
 			default:
 				break;
 			}
@@ -248,15 +187,15 @@ static void print_all_reports(chrony_session *s) {
 	}
 }
 
-int main() {
+int main(int argc, char **argv) {
 	chrony_session *s;
 	int fd, r = 0;
 
-	fd = connect_unix();
-	if (fd < 0)
-		fd = connect_inet();
-	if (fd < 0)
+	fd = chrony_open_socket(argc > 1 ? argv[1] : NULL);
+	if (fd < 0) {
+		perror("Could not open socket");
 		return 1;
+	}
 
 	if (chrony_init_session(&s, fd) == CHRONY_OK) {
 		print_all_reports(s);
@@ -265,8 +204,7 @@ int main() {
 		r = 1;
 	}
 
-	remove_unix(fd);
-	close(fd);
+	chrony_close_socket(fd);
 
 	return r;
 }
