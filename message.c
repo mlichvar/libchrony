@@ -126,6 +126,46 @@ static const Field request_by_address_fields[] = {
 	{ NULL }
 };
 
+static const Constant authdata_mode_enums[] = {
+	{ 0, "None" },
+	{ 1, "Symmetric key" },
+	{ 2, "NTS" },
+	{ 0 }
+};
+
+static const Constant authdata_keytype_enums[] = {
+	{ 1, "MD5" },
+	{ 2, "SHA1" },
+	{ 3, "SHA256" },
+	{ 4, "SHA384" },
+	{ 5, "SHA512" },
+	{ 6, "SHA3-224" },
+	{ 7, "SHA3-256" },
+	{ 8, "SHA3-384" },
+	{ 9, "SHA3-512" },
+	{ 10, "TIGER" },
+	{ 11, "WHIRLPOOL" },
+	{ 13, "AES128" },
+	{ 14, "AES256" },
+	{ 15, "AEAD-AES-SIV-CMAC-256" },
+	{ 30, "AEAD-AES-128-GCM-SIV" },
+	{ 0 }
+};
+
+static const Field authdata_report_fields[] = {
+	{ "Mode", TYPE_UINT16, CHRONY_CONTENT_ENUM, authdata_mode_enums },
+	{ "Key type", TYPE_UINT16, CHRONY_CONTENT_ENUM, authdata_keytype_enums },
+	{ "Key ID", TYPE_UINT32, CHRONY_CONTENT_INDEX },
+	{ "Key length", TYPE_UINT16, CHRONY_CONTENT_LENGTH_BITS },
+	{ "Key establishment attempts", TYPE_UINT16, CHRONY_CONTENT_COUNT },
+	{ "Last key establishment ago", TYPE_UINT32, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ "Cookies", TYPE_UINT16, CHRONY_CONTENT_COUNT },
+	{ "Cookie length", TYPE_UINT16, CHRONY_CONTENT_LENGTH_BYTES },
+	{ "NAK", TYPE_UINT16, CHRONY_CONTENT_BOOLEAN },
+	{ "Reserved #1", TYPE_UINT16, CHRONY_CONTENT_NONE },
+	{ NULL }
+};
+
 static const Constant ntp_mode_enums[] = {
 	{ 1, "Active symmetric" },
 	{ 2, "Passive symmetric" },
@@ -212,6 +252,13 @@ static const Report reports[] = {
 		.name = "activity",
 		.record_requests = { { 44 }, },
 		.record_responses = { { 12, activity_report_fields }, }
+	},
+	{
+		.name = "authdata",
+		.count_requests = { { 14 }, },
+		.count_responses = { { 2, num_sources_fields }, },
+		.record_requests = { { 67, request_by_address_fields }, },
+		.record_responses = { { 20, authdata_report_fields }, }
 	},
 	{
 		.name = "ntpdata",

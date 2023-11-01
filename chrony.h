@@ -94,6 +94,9 @@ typedef enum {
 	CHRONY_CONTENT_ADDRESS,
 	CHRONY_CONTENT_PORT,
 	CHRONY_CONTENT_INDEX,
+	CHRONY_CONTENT_LENGTH_BITS,
+	CHRONY_CONTENT_LENGTH_BYTES,
+	CHRONY_CONTENT_BOOLEAN,
 } chrony_field_content;
 
 int chrony_get_record_number_fields(chrony_session *s);
