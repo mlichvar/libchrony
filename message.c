@@ -112,6 +112,50 @@ static const Field sourcestats_report_fields[] = {
 	{ NULL }
 };
 
+static const Constant selectdata_state_enums[] = {
+	{ 'N', "Ignored" },
+	{ 's', "Not synchronized" },
+	{ 'M', "Missing samples" },
+	{ 'd', "Unacceptable distance" },
+	{ 'D', "Large distance" },
+	{ '~', "Jittery" },
+	{ 'w', "Waiting for others" },
+	{ 'W', "Missing selectable sources" },
+	{ 'S', "Stale" },
+	{ 'O', "Orphan" },
+	{ 'T', "Not trusted" },
+	{ 'P', "Not preferred" },
+	{ 'U', "Waiting for update" },
+	{ 'x', "Falseticker" },
+	{ '+', "Combined" },
+	{ '*', "Best" },
+	{ 0 }
+};
+
+static const Constant selectdata_option_flags[] = {
+	{ 0x1, "noselect" },
+	{ 0x2, "prefer" },
+	{ 0x4, "trust" },
+	{ 0x8, "require" },
+	{ 0 }
+};
+
+static const Field selectdata_report_fields[] = {
+	{ "Reference ID", TYPE_UINT32, CHRONY_CONTENT_REFERENCE_ID },
+	{ "Address", TYPE_ADDRESS, CHRONY_CONTENT_ADDRESS },
+	{ "State", TYPE_UINT8, CHRONY_CONTENT_ENUM, selectdata_state_enums },
+	{ "Authentication", TYPE_UINT8, CHRONY_CONTENT_BOOLEAN },
+	{ "Leap status", TYPE_UINT8, CHRONY_CONTENT_ENUM, leap_enums },
+	{ "Reserved #1", TYPE_UINT8, CHRONY_CONTENT_NONE },
+	{ "Configured options", TYPE_UINT16, CHRONY_CONTENT_FLAGS, selectdata_option_flags },
+	{ "Effective options", TYPE_UINT16, CHRONY_CONTENT_FLAGS, selectdata_option_flags },
+	{ "Last sample ago", TYPE_UINT32, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ "Score", TYPE_FLOAT, CHRONY_CONTENT_RATIO },
+	{ "Low limit", TYPE_FLOAT, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ "High limit", TYPE_FLOAT, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ NULL }
+};
+
 static const Field activity_report_fields[] = {
 	{ "Sources online", TYPE_UINT32, CHRONY_CONTENT_COUNT },
 	{ "Sources offline", TYPE_UINT32, CHRONY_CONTENT_COUNT },
@@ -247,6 +291,13 @@ static const Report reports[] = {
 		.count_responses = { { 2, num_sources_fields }, },
 		.record_requests = { { 34, request_by_index_fields }, },
 		.record_responses = { { 6, sourcestats_report_fields }, },
+	},
+	{
+		.name = "selectdata",
+		.count_requests = { { 14 }, },
+		.count_responses = { { 2, num_sources_fields }, },
+		.record_requests = { { 69, request_by_index_fields }, },
+		.record_responses = { { 23, selectdata_report_fields }, },
 	},
 	{
 		.name = "activity",
