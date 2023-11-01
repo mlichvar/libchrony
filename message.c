@@ -22,8 +22,10 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <math.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
 
 #define REQUEST_HEADER_LEN 20
 #define RESPONSE_HEADER_LEN 28
