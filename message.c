@@ -400,10 +400,21 @@ chrony_err process_response(Message *msg, const Response *expected_responses) {
 	code = ntohs(*(uint16_t *)&msg->msg[6]);
 	status = ntohs(*(uint16_t *)&msg->msg[8]);
 
-	if (status == 2)
+	switch (status) {
+	case 0: /* OK */
+		break;
+	case 2: /* Unauthorized */
 		return CHRONY_UNAUTHORIZED;
-	if (status != 0)
+	case 3: /* Invalid */
+		return CHRONY_OLD_SERVER;
+	case 6: /* Not enabled */
+		return CHRONY_DISABLED;
+	case 18:/* Bad packet version */
+	case 19:/* Bad packet length */
+		return CHRONY_NEW_SERVER;
+	default:
 		return CHRONY_UNEXPECTED_STATUS;
+	}
 
 	for (i = 0; i < 1; i++) {
 		if (code == expected_responses[i].code) {
@@ -413,7 +424,7 @@ chrony_err process_response(Message *msg, const Response *expected_responses) {
 	}
 
 	if (!msg->fields)
-		return CHRONY_UNSUPPORTED_RESPONSE;
+		return CHRONY_NEW_SERVER;
 
 	for (i = 0; msg->fields[i].type != TYPE_NONE; i++)
 		;

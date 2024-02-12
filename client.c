@@ -59,11 +59,13 @@ const char *chrony_get_error_string(chrony_err e) {
 		"CHRONY_INVALID_ARGUMENT",
 		"CHRONY_UNEXPECTED_CALL",
 		"CHRONY_UNAUTHORIZED",
+		"CHRONY_DISABLED",
 		"CHRONY_UNEXPECTED_STATUS",
-		"CHRONY_UNSUPPORTED_RESPONSE",
+		"CHRONY_OLD_SERVER",
+		"CHRONY_NEW_SERVER",
 		"CHRONY_INVALID_RESPONSE",
 	};
-	assert(CHRONY_INVALID_RESPONSE == 12);
+	assert(CHRONY_INVALID_RESPONSE == 14);
 
 	if (e < 0 || e >= sizeof (strings) / sizeof (strings[0]))
 		return "Unknown error";
