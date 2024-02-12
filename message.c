@@ -416,7 +416,7 @@ chrony_err process_response(Message *msg, const Response *expected_responses) {
 		return CHRONY_UNEXPECTED_STATUS;
 	}
 
-	for (i = 0; i < 1; i++) {
+	for (i = 0; i < MAX_RESPONSES && expected_responses[i].fields; i++) {
 		if (code == expected_responses[i].code) {
 			msg->fields = expected_responses[i].fields;
 			break;
