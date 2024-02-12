@@ -258,6 +258,43 @@ static const Field ntpdata_report_fields[] = {
 	{ NULL }
 };
 
+static const Field ntpdata2_report_fields[] = {
+	{ "Remote address", TYPE_ADDRESS, CHRONY_CONTENT_ADDRESS },
+	{ "Local address", TYPE_ADDRESS, CHRONY_CONTENT_ADDRESS },
+	{ "Remote port", TYPE_UINT16, CHRONY_CONTENT_PORT },
+	{ "Leap status", TYPE_UINT8, CHRONY_CONTENT_ENUM, leap_enums },
+	{ "Version", TYPE_UINT8, CHRONY_CONTENT_COUNT },
+	{ "Mode", TYPE_UINT8, CHRONY_CONTENT_ENUM, ntp_mode_enums },
+	{ "Stratum", TYPE_UINT8, CHRONY_CONTENT_COUNT },
+	{ "Poll", TYPE_INT8, CHRONY_CONTENT_INTERVAL_LOG2_SECONDS },
+	{ "Precision", TYPE_INT8, CHRONY_CONTENT_INTERVAL_LOG2_SECONDS },
+	{ "Root delay", TYPE_FLOAT, CHRONY_CONTENT_MEASURE_SECONDS },
+	{ "Root dispersion", TYPE_FLOAT, CHRONY_CONTENT_MEASURE_SECONDS },
+	{ "Reference ID", TYPE_UINT32, CHRONY_CONTENT_REFERENCE_ID },
+	{ "Reference time", TYPE_TIMESPEC, CHRONY_CONTENT_TIME },
+	{ "Offset", TYPE_FLOAT, CHRONY_CONTENT_OFFSET_SECONDS },
+	{ "Peer delay", TYPE_FLOAT, CHRONY_CONTENT_MEASURE_SECONDS },
+	{ "Peer dispersion", TYPE_FLOAT, CHRONY_CONTENT_MEASURE_SECONDS },
+	{ "Response time", TYPE_FLOAT, CHRONY_CONTENT_MEASURE_SECONDS },
+	{ "Jitter asymmetry", TYPE_FLOAT, CHRONY_CONTENT_RATIO },
+	{ "Flags", TYPE_UINT16, CHRONY_CONTENT_FLAGS, ntp_flags },
+	{ "Transmit timestamping", TYPE_UINT8, CHRONY_CONTENT_ENUM, ntp_timestamping_enums },
+	{ "Receive timestamping", TYPE_UINT8, CHRONY_CONTENT_ENUM, ntp_timestamping_enums },
+	{ "Transmitted messages", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Received messages", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Received valid messages", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Received good messages", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Kernel transmit timestamps", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Kernel receive timestamps", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Hardware transmit timestamps", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Hardware receive timestamps", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Reserved #1", TYPE_UINT32, CHRONY_CONTENT_NONE },
+	{ "Reserved #2", TYPE_UINT32, CHRONY_CONTENT_NONE },
+	{ "Reserved #3", TYPE_UINT32, CHRONY_CONTENT_NONE },
+	{ "Reserved #4", TYPE_UINT32, CHRONY_CONTENT_NONE },
+	{ NULL }
+};
+
 static const Report reports[] = {
 	{
 		.name = "tracking",
@@ -302,6 +339,7 @@ static const Report reports[] = {
 		.count_requests = { { 14 }, },
 		.count_responses = { { 2, num_sources_fields }, },
 		.record_requests = { { 57, request_by_address_fields }, },
-		.record_responses = { { 16, ntpdata_report_fields }, }
+		.record_responses = { { 16, ntpdata_report_fields },
+				      { 26, ntpdata2_report_fields }, }
 	},
 };
