@@ -263,6 +263,7 @@ const char *chrony_get_field_name(chrony_session *s, int field) {
 
 chrony_field_type chrony_get_field_type(chrony_session *s, int field) {
 	switch (resolve_field_type(&s->response_msg, field)) {
+	case TYPE_UINT64:
 	case TYPE_UINT32:
 	case TYPE_UINT16:
 	case TYPE_UINT8:

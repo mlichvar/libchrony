@@ -158,6 +158,8 @@ static int get_field_len(const Field *fields, int field) {
 	switch (fields[field].type) {
 	case TYPE_NONE:
 		return 0;
+	case TYPE_UINT64:
+		return 8;
 	case TYPE_UINT32:
 		return 4;
 	case TYPE_UINT16:
@@ -255,6 +257,9 @@ uint64_t get_field_uinteger(const Message *msg, int field) {
 		return 0;
 
 	switch (resolve_field_type(msg, field)) {
+	case TYPE_UINT64:
+		return ((uint64_t)ntohl(*(uint32_t *)(msg->msg + pos)) << 32) |
+			ntohl(*(uint32_t *)(msg->msg + pos + 4));
 	case TYPE_UINT32:
 		return ntohl(*(uint32_t *)(msg->msg + pos));
 	case TYPE_UINT16:
