@@ -23,7 +23,7 @@
 
 #define MAX_MESSAGE_LEN 1024
 #define MAX_REQUESTS 2
-#define MAX_RESPONSES 2
+#define MAX_RESPONSES 4
 
 typedef enum {
 	TYPE_NONE = 0,

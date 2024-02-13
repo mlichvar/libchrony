@@ -295,6 +295,67 @@ static const Field ntpdata2_report_fields[] = {
 	{ NULL }
 };
 
+static const Field serverstats_report_fields[] = {
+	{ "NTP requests received", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Command requests received", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTP requests dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Command requests dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Client log records dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ NULL }
+};
+
+static const Field serverstats2_report_fields[] = {
+	{ "NTP requests received", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTS-KE connections accepted", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Command requests received", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTP requests dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTS-KE connections dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Command requests dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Client log records dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Authenticated NTP requests", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ NULL }
+};
+
+static const Field serverstats3_report_fields[] = {
+	{ "NTP requests received", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTS-KE connections accepted", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Command requests received", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTP requests dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTS-KE connections dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Command requests dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Client log records dropped", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Authenticated NTP requests", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "Interleaved NTP requests", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTP timestamps held", TYPE_UINT32, CHRONY_CONTENT_COUNT },
+	{ "NTP timestamp span", TYPE_UINT32, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ NULL }
+};
+
+static const Field serverstats4_report_fields[] = {
+	{ "NTP requests received", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "NTS-KE connections accepted", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Command requests received", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "NTP requests dropped", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "NTS-KE connections dropped", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Command requests dropped", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Client log records dropped", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Authenticated NTP requests", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Interleaved NTP requests", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "NTP timestamps held", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "NTP timestamp span", TYPE_UINT64, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ "Served daemon RX timestamps", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Served daemon TX timestamps", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Served kernel RX timestamps", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Served kernel TX timestamps", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Served hardware RX timestamps", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Served hardware TX timestamps", TYPE_UINT64, CHRONY_CONTENT_COUNT },
+	{ "Reserved #1", TYPE_UINT64, CHRONY_CONTENT_NONE },
+	{ "Reserved #2", TYPE_UINT64, CHRONY_CONTENT_NONE },
+	{ "Reserved #3", TYPE_UINT64, CHRONY_CONTENT_NONE },
+	{ "Reserved #4", TYPE_UINT64, CHRONY_CONTENT_NONE },
+	{ NULL }
+};
+
 static const Report reports[] = {
 	{
 		.name = "tracking",
@@ -341,5 +402,13 @@ static const Report reports[] = {
 		.record_requests = { { 57, request_by_address_fields }, },
 		.record_responses = { { 16, ntpdata_report_fields },
 				      { 26, ntpdata2_report_fields }, }
+	},
+	{
+		.name = "serverstats",
+		.record_requests = { { 54 }, },
+		.record_responses = { { 14, serverstats_report_fields },
+				      { 22, serverstats2_report_fields },
+				      { 24, serverstats3_report_fields },
+				      { 25, serverstats4_report_fields }, }
 	},
 };
