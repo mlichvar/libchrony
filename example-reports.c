@@ -160,6 +160,9 @@ static int print_report(chrony_session *s, int report_index) {
 			case CHRONY_CONTENT_MEASURE_PPM:
 				printf(" ppm");
 				break;
+			case CHRONY_CONTENT_OFFSET_PPM_PER_SECOND:
+				printf(" ppm per second");
+				break;
 			case CHRONY_CONTENT_LENGTH_BITS:
 				printf(" bits");
 				break;
