@@ -366,6 +366,22 @@ static const Field rtcdata_report_fields[] = {
 	{ NULL }
 };
 
+static const Constant smoothing_flags[] = {
+	{ 0x1, "active" },
+	{ 0x2, "leaponly" },
+	{ 0 }
+};
+
+static const Field smoothing_report_fields[] = {
+	{ "Flags", TYPE_UINT32, CHRONY_CONTENT_FLAGS, smoothing_flags },
+	{ "Offset", TYPE_FLOAT, CHRONY_CONTENT_OFFSET_SECONDS },
+	{ "Frequency offset", TYPE_FLOAT, CHRONY_CONTENT_OFFSET_PPM },
+	{ "Wander", TYPE_FLOAT, CHRONY_CONTENT_OFFSET_PPM_PER_SECOND },
+	{ "Last update ago", TYPE_FLOAT, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ "Remaining time", TYPE_FLOAT, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ NULL }
+};
+
 static const Report reports[] = {
 	{
 		.name = "tracking",
@@ -425,5 +441,10 @@ static const Report reports[] = {
 		.name = "rtcdata",
 		.record_requests = { { 35 }, },
 		.record_responses = { { 7, rtcdata_report_fields }, }
+	},
+	{
+		.name = "smoothing",
+		.record_requests = { { 51 }, },
+		.record_responses = { { 13, smoothing_report_fields }, }
 	},
 };
