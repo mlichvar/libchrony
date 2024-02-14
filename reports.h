@@ -356,6 +356,16 @@ static const Field serverstats4_report_fields[] = {
 	{ NULL }
 };
 
+static const Field rtcdata_report_fields[] = {
+	{ "Reference time", TYPE_TIMESPEC, CHRONY_CONTENT_TIME },
+	{ "Samples", TYPE_UINT16, CHRONY_CONTENT_COUNT },
+	{ "Runs", TYPE_UINT16, CHRONY_CONTENT_COUNT },
+	{ "Span", TYPE_UINT32, CHRONY_CONTENT_INTERVAL_SECONDS },
+	{ "Offset", TYPE_FLOAT, CHRONY_CONTENT_OFFSET_SECONDS },
+	{ "Frequency offset", TYPE_FLOAT, CHRONY_CONTENT_OFFSET_PPM },
+	{ NULL }
+};
+
 static const Report reports[] = {
 	{
 		.name = "tracking",
@@ -410,5 +420,10 @@ static const Report reports[] = {
 				      { 22, serverstats2_report_fields },
 				      { 24, serverstats3_report_fields },
 				      { 25, serverstats4_report_fields }, }
+	},
+	{
+		.name = "rtcdata",
+		.record_requests = { { 35 }, },
+		.record_responses = { { 7, rtcdata_report_fields }, }
 	},
 };
