@@ -27,6 +27,9 @@ $(lib): client.lo message.lo socket.lo
 example-reports: example-reports.o $(lib)
 	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
+fuzz: fuzz.o $(lib)
+	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 install: $(lib)
 	mkdir -p $(libdir) $(includedir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(lib) $(libdir)
