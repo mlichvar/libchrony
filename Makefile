@@ -4,11 +4,15 @@ LDFLAGS = -lm
 INSTALL = install
 LIBTOOL = libtool
 
-lib = libchrony.la
+name = libchrony
+version = 0.1
+
+lib = $(name).la
 lib_version = 0:0:0
 
 prefix = /usr/local
 libdir = $(prefix)/lib
+pkgconfigdir = $(libdir)/pkgconfig
 includedir = $(prefix)/include
 
 objs = $(patsubst %.c,%.o,$(wildcard *.c))
@@ -31,9 +35,15 @@ fuzz: fuzz.o $(lib)
 	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 install: $(lib)
-	mkdir -p $(libdir) $(includedir)
+	mkdir -p $(libdir) $(libdir)/pkgconfig $(includedir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(lib) $(libdir)
 	$(INSTALL) -m644 $(headers) $(includedir)
+	@echo "Generating $(pkgconfigdir)/$(name).pc"
+	@echo "Name: $(name)" > $(pkgconfigdir)/$(name).pc
+	@echo "Version: $(version)" >> $(pkgconfigdir)/$(name).pc
+	@echo "Description: Library for chronyd monitoring" >> $(pkgconfigdir)/$(name).pc
+	@echo "Libs: -L$(libdir) -l$(subst lib,,$(name))" >> $(pkgconfigdir)/$(name).pc
+	@echo "Cflags: -I$(includedir)" >> $(pkgconfigdir)/$(name).pc
 
 clean:
 	-rm -rf $(lib) $(examples) *.o *.lo .deps .libs
