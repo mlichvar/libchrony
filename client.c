@@ -261,6 +261,16 @@ const char *chrony_get_field_name(chrony_session *s, int field) {
 	return resolve_field_name(&s->response_msg, field);
 }
 
+int chrony_get_field_index(chrony_session *s, const char *name) {
+	int i;
+
+	for (i = 0; i < chrony_get_record_number_fields(s); i++)
+		if (strcmp(name, chrony_get_field_name(s, i)) == 0)
+			return i;
+
+	return -1;
+}
+
 chrony_field_type chrony_get_field_type(chrony_session *s, int field) {
 	switch (resolve_field_type(&s->response_msg, field)) {
 	case TYPE_UINT64:

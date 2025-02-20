@@ -104,6 +104,7 @@ typedef enum {
 
 int chrony_get_record_number_fields(chrony_session *s);
 const char *chrony_get_field_name(chrony_session *s, int field);
+int chrony_get_field_index(chrony_session *s, const char *name);
 chrony_field_type chrony_get_field_type(chrony_session *s, int field);
 chrony_field_content chrony_get_field_content(chrony_session *s, int field);
 
