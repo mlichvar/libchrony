@@ -1,11 +1,13 @@
 CC = cc
 CFLAGS = -O2 -Wall -g
-LDFLAGS = -lm
+LDFLAGS =
 INSTALL = install
 LIBTOOL = libtool
 
 name = libchrony
 version = 0.1
+
+libs = -lm
 
 lib = $(name).la
 lib_version = 0:0:0
@@ -26,13 +28,13 @@ all: $(lib) $(examples)
 
 $(lib): client.lo message.lo socket.lo
 	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -version-info $(lib_version) \
-		-rpath $(libdir) -o $@ $^ $(LDFLAGS)
+		-rpath $(libdir) -o $@ $^ $(LDFLAGS) $(libs)
 
 example-reports: example-reports.o $(lib)
-	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(libs)
 
 fuzz: fuzz.o $(lib)
-	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(libs)
 
 install: $(lib)
 	mkdir -p $(libdir) $(libdir)/pkgconfig $(includedir)
