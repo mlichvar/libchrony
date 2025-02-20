@@ -197,11 +197,11 @@ int chrony_get_report_number_records(chrony_session *s) {
 }
 
 chrony_err chrony_request_record(chrony_session *s, const char *report_name, int record) {
+	void *args[1] = { NULL };
 	uint32_t index = record;
 	const Report *report;
 	const Field *fields;
 	chrony_err r;
-	void *args[1];
 
 	s->follow_report = NULL;
 again:
