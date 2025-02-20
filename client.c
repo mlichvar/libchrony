@@ -154,7 +154,7 @@ static chrony_err send_request(chrony_session *s, const Request *request,
 		return CHRONY_RANDOM_FAILED;
 	}
 
-	format_request(&s->request_msg, random(), request, values, expected_responses);
+	format_request(&s->request_msg, sequence, request, values, expected_responses);
 
 	if (send(s->fd, s->request_msg.msg, s->request_msg.len, 0) < 0) {
 		s->state = STATE_IDLE;
