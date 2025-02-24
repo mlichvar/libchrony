@@ -49,21 +49,21 @@ struct chrony_session_t {
 
 const char *chrony_get_error_string(chrony_err e) {
 	static const char *strings[] = {
-		"CHRONY_OK",
-		"CHRONY_NO_MEMORY",
-		"CHRONY_NO_RANDOM",
-		"CHRONY_UNKNOWN_REPORT",
-		"CHRONY_RANDOM_FAILED",
-		"CHRONY_SEND_FAILED",
-		"CHRONY_RECV_FAILED",
-		"CHRONY_INVALID_ARGUMENT",
-		"CHRONY_UNEXPECTED_CALL",
-		"CHRONY_UNAUTHORIZED",
-		"CHRONY_DISABLED",
-		"CHRONY_UNEXPECTED_STATUS",
-		"CHRONY_OLD_SERVER",
-		"CHRONY_NEW_SERVER",
-		"CHRONY_INVALID_RESPONSE",
+		"Success",
+		"Failed to allocate memory",
+		"Failed to open /dev/urandom",
+		"Unknown report",
+		"Failed to read /dev/urandom",
+		"Failed to send request",
+		"Failed to receive response",
+		"Invalid argument",
+		"Unexpected function call",
+		"Not authorized",
+		"Disabled",
+		"Unexpected status",
+		"Unsupported server version (too old)",
+		"Unsupported server version (too new)",
+		"Invalid response",
 	};
 	assert(CHRONY_INVALID_RESPONSE == 14);
 
