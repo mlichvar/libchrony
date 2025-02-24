@@ -59,7 +59,6 @@ int chrony_get_fd(chrony_session *s);
 
 bool chrony_needs_response(chrony_session *s);
 chrony_err chrony_process_response(chrony_session *s);
-chrony_err chrony_timeout(chrony_session *s);
 
 int chrony_get_number_supported_reports(void);
 const char *chrony_get_report_name(int report);
