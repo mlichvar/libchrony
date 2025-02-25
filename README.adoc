@@ -2,9 +2,23 @@
 
 `libchrony` is a C library for monitoring `chronyd`. It communicates with
 `chronyd` directly over Unix domain or UDP socket, not relying on `chronyc`.
+It supports `chronyd` versions 1.29.1 and later.
 
-See `example-reports.c` for an example application printing all data from all
-supported reports.
+The following reports are supported:
+
+- activity
+- authdata
+- ntpdata
+- rtcdata
+- selectdata
+- serverstats
+- smoothing
+- sources
+- sourcestats
+- tracking
+
+The API is documented in the `chrony.h` header. An example application printing
+all data from all supported reports is in `example-reports.c`.
 
 == Requirements
 
@@ -16,7 +30,7 @@ supported reports.
 
 ```
 $ make
-# make install prefix=/usr/local
+# make install prefix=/usr/local DESTDIR=
 ```
 
 == Author
