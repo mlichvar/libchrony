@@ -37,15 +37,17 @@ fuzz: fuzz.o $(lib)
 	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(libs)
 
 install: $(lib)
-	mkdir -p $(libdir) $(libdir)/pkgconfig $(includedir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(lib) $(libdir)
-	$(INSTALL) -m644 $(headers) $(includedir)
-	@echo "Generating $(pkgconfigdir)/$(name).pc"
-	@echo "Name: $(name)" > $(pkgconfigdir)/$(name).pc
-	@echo "Version: $(version)" >> $(pkgconfigdir)/$(name).pc
-	@echo "Description: Library for chronyd monitoring" >> $(pkgconfigdir)/$(name).pc
-	@echo "Libs: -L$(libdir) -l$(subst lib,,$(name))" >> $(pkgconfigdir)/$(name).pc
-	@echo "Cflags: -I$(includedir)" >> $(pkgconfigdir)/$(name).pc
+	mkdir -p $(DESTDIR)$(libdir)/pkgconfig $(DESTDIR)$(includedir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(lib) $(DESTDIR)$(libdir)
+	$(INSTALL) -m644 $(headers) $(DESTDIR)$(includedir)
+	@echo "Generating $(DESTDIR)$(pkgconfigdir)/$(name).pc"
+	@echo "Name: $(name)" > $(DESTDIR)$(pkgconfigdir)/$(name).pc
+	@echo "Version: $(version)" >> $(DESTDIR)$(pkgconfigdir)/$(name).pc
+	@echo "Description: Library for chronyd monitoring" >> \
+		$(DESTDIR)$(pkgconfigdir)/$(name).pc
+	@echo "Libs: -L$(libdir) -l$(subst lib,,$(name))" >> \
+		$(DESTDIR)$(pkgconfigdir)/$(name).pc
+	@echo "Cflags: -I$(includedir)" >> $(DESTDIR)$(pkgconfigdir)/$(name).pc
 
 clean:
 	-rm -rf $(lib) $(examples) *.o *.lo .deps .libs
