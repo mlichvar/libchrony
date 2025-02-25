@@ -29,7 +29,7 @@ static chrony_err process_responses(chrony_session *s) {
 	chrony_err r;
 
 	if (clock_gettime(CLOCK_MONOTONIC, &ts1) < 0) {
-		fprintf(stderr, "Could not read monotonic clock\n");
+		fprintf(stderr, "Error: Could not read monotonic clock\n");
 		return -1;
 	}
 
@@ -41,7 +41,7 @@ static chrony_err process_responses(chrony_session *s) {
 			perror("poll");
 			return -1;
 		} else if (n == 0) {
-			fprintf(stderr, "No valid response received\n");
+			fprintf(stderr, "Error: No valid response received\n");
 			return -1;
 		}
 		r = chrony_process_response(s);
@@ -49,7 +49,7 @@ static chrony_err process_responses(chrony_session *s) {
 			return r;
 
 		if (clock_gettime(CLOCK_MONOTONIC, &ts2) < 0) {
-			fprintf(stderr, "Could not read monotonic clock\n");
+			fprintf(stderr, "Error: Could not read monotonic clock\n");
 			return -1;
 		}
 		timeout -= (ts2.tv_sec - ts1.tv_sec) * 1000 +
@@ -186,7 +186,7 @@ static void print_all_reports(chrony_session *s) {
 	for (i = 0; i < chrony_get_number_supported_reports(); i++) {
 		r = print_report(s, i);
 		if (r != CHRONY_OK && r != -1)
-			printf("%s\n", chrony_get_error_string(r));
+			printf("Error: %s\n", chrony_get_error_string(r));
 	}
 }
 
