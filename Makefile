@@ -48,6 +48,7 @@ install: $(lib)
 	@echo "Libs: -L$(libdir) -l$(subst lib,,$(name))" >> \
 		$(DESTDIR)$(pkgconfigdir)/$(name).pc
 	@echo "Cflags: -I$(includedir)" >> $(DESTDIR)$(pkgconfigdir)/$(name).pc
+	chmod 644 $(DESTDIR)$(pkgconfigdir)/$(name).pc
 
 clean:
 	-rm -rf $(lib) $(examples) *.o *.lo .deps .libs
