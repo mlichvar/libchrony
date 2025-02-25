@@ -120,6 +120,7 @@ chrony_err process_response(Message *msg, const Response *expected_responses) {
 	case 3: /* Invalid */
 		return CHRONY_OLD_SERVER;
 	case 6: /* Not enabled */
+	case 13:/* No RTC */
 		return CHRONY_DISABLED;
 	case 18:/* Bad packet version */
 	case 19:/* Bad packet length */
