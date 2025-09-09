@@ -20,6 +20,7 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,95 +31,180 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MAX_UNIX_SOCKET_INDEX 1000
+#define MAX_UN_PATH_LENGTH (sizeof ((struct sockaddr_un *)NULL)->sun_path)
 
 static void remove_unix_socket(int fd) {
 	struct sockaddr_un addr;
 	socklen_t len;
+	char *s;
+	int i;
+
+	/* Remove the socket and the two directories in which it was placed */
 
 	len = sizeof (addr);
-	if (getsockname(fd, (struct sockaddr *)&addr, &len) == 0 &&
-	    addr.sun_family == AF_UNIX && len <= sizeof (addr)) {
-		unlink(addr.sun_path);
+	if (getsockname(fd, (struct sockaddr *)&addr, &len) < 0 ||
+	    addr.sun_family != AF_UNIX || len > sizeof (addr) ||
+	    strnlen(addr.sun_path, sizeof (addr.sun_path)) >= sizeof (addr.sun_path))
+		return;
+
+	if (unlink(addr.sun_path) < 0)
+		return;
+
+	for (i = 0; i < 2; i++) {
+		s = strrchr(addr.sun_path, '/');
+		if (!s)
+			return;
+		*s = '\0';
+
+		if (rmdir(addr.sun_path) < 0)
+			return;
 	}
 }
 
-static int open_unix_socket(const char *path) {
-	struct sockaddr_un sa;
-	char *s, dir[256];
-	int i, fd, fd2;
+static int generate_random_path(FILE *urandom, char *path, int length) {
+	int i;
 
-	if (snprintf(dir, sizeof (dir), "%s", path) >= sizeof (dir)) {
+	for (i = 0; i + 1 < length; ) {
+		if (fread(&path[i], 1, 1, urandom) != 1)
+			return 0;
+		if ((path[i] >= 'A' && path[i] <= 'Z') ||
+		    (path[i] >= 'a' && path[i] <= 'z') ||
+		    (path[i] >= '0' && path[i] <= '9'))
+			i++;
+	}
+	path[i] = '\0';
+
+	return 1;
+}
+
+static int open_unix_socket(const char *path) {
+	char dir0[MAX_UN_PATH_LENGTH], dir1[MAX_UN_PATH_LENGTH], dir2[MAX_UN_PATH_LENGTH];
+	char rand1[12 + 1], rand2[16 + 1], *s;
+	struct sockaddr_un client_un, server_un;
+	int fd = -1, dir_fd1 = -1;
+	struct stat st;
+	FILE *urandom;
+
+	memset(&server_un, 0, sizeof (server_un));
+	server_un.sun_family = AF_UNIX;
+	memset(&client_un, 0, sizeof (client_un));
+	client_un.sun_family = AF_UNIX;
+
+	/* First, try to connect to the server socket without binding our
+	   socket to see if it can actually be accessed */
+
+	if (snprintf(server_un.sun_path, sizeof (server_un.sun_path),
+		     "%s", path) >= sizeof (server_un.sun_path)) {
 		errno = EINVAL;
-		return -1;
+		goto error1;
 	}
 
-	s = strrchr(dir, '/');
-	if (!s || s == dir) {
+	fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if (fd < 0 ||
+	    connect(fd, (struct sockaddr *)&server_un, sizeof (server_un)) < 0)
+		goto error1;
+	close(fd);
+	fd = -1;
+
+	/* Prepare the path of the client socket and directories that will be
+	   created in order to hide the socket from chronyd running under a
+	   different user before the socket permissions are changed by chmod()
+	   later in this function. If the chronyd process was compromised and
+	   the socket path was readable or predictable, it could try to replace
+	   the socket with a symlink in order for the chmod() call to change
+	   permissions of something else.
+
+	   The client socket path is constructed as follows:
+		   dir0 = dirname($server_un)
+		   dir1 = $dir0/libchrony.$rand1
+		   dir2 = $dir0/libchrony.$rand1/$rand2
+		   client_un = $dir0/libchrony.$rand1/$rand2/sock */
+
+	if (snprintf(dir0, sizeof (dir0), "%s", path) >= sizeof (dir0)) {
 		errno = EINVAL;
-		return -1;
+		goto error1;
+	}
+
+	s = strrchr(dir0, '/');
+	if (!s || s == dir0) {
+		errno = EINVAL;
+		goto error1;
 	}
 	*s = '\0';
 
-	fd = socket(AF_UNIX, SOCK_DGRAM, 0);
-	if (fd < 0)
-		return -1;
+	urandom = fopen("/dev/urandom", "r");
+	if (!urandom)
+		goto error1;
 
-	sa.sun_family = AF_UNIX;
-
-	for (i = 1; i <= MAX_UNIX_SOCKET_INDEX; i++) {
-		if (snprintf(sa.sun_path, sizeof (sa.sun_path),
-			     "%s/libchrony.%d", dir, i) >= sizeof (sa.sun_path)) {
-			close(fd);
-			errno = EINVAL;
-			return -1;
-		}
-
-		if (bind(fd, (struct sockaddr *)&sa, sizeof (sa)) == 0)
-			break;
-
-		if (errno != EADDRINUSE) {
-			close(fd);
-			return -1;
-		}
-
-		fd2 = socket(AF_UNIX, SOCK_DGRAM, 0);
-		if (fd2 < 0) {
-			close(fd);
-			return -1;
-		}
-
-		/* Remove the conflicting socket if it is no longer used */
-		if (connect(fd2, (struct sockaddr *)&sa, sizeof (sa)) < 0 &&
-		    errno == ECONNREFUSED && unlink(sa.sun_path) == 0)
-			i--;
-		close(fd2);
+	if (!generate_random_path(urandom, rand1, sizeof (rand1)) ||
+	    !generate_random_path(urandom, rand2, sizeof (rand2))) {
+		fclose(urandom);
+		goto error1;
 	}
+	fclose(urandom);
 
-	if (i > MAX_UNIX_SOCKET_INDEX) {
-		close(fd);
-		errno = EMFILE;
-		return -1;
-	}
-
-	/* Allow chronyd running under a different user to send responses to
-	   our socket. Access to the socket is protected by the directory. */
-	chmod(sa.sun_path, 0666);
-
-	if (snprintf(sa.sun_path, sizeof (sa.sun_path), "%s", path) >= sizeof (sa.sun_path)) {
-		remove_unix_socket(fd);
-		close(fd);
+	if (snprintf(dir1, sizeof (dir1),
+		     "%s/libchrony.%s", dir0, rand1) >= sizeof (dir1) ||
+	    snprintf(dir2, sizeof (dir2),
+		     "%s/%s", dir1, rand2) >= sizeof (dir2) ||
+	    snprintf(client_un.sun_path, sizeof (client_un.sun_path),
+		     "%s/sock", dir2) >= sizeof (client_un.sun_path)) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	if (connect(fd, (struct sockaddr *)&sa, sizeof (sa)) < 0) {
-		remove_unix_socket(fd);
-		close(fd);
-		return -1;
+	/* Create the directories and bind the socket */
+
+	if (mkdir(dir1, 0711) < 0)
+		goto error1;
+
+	dir_fd1 = open(dir1, O_RDONLY | O_NOFOLLOW);
+	if (dir_fd1 < 0 ||
+	    fstat(dir_fd1, &st) < 0)
+		goto error2;
+
+	if (!S_ISDIR(st.st_mode) ||
+	    (st.st_mode & 0777 & ~0711) != 0 ||
+	    st.st_uid != geteuid()) {
+		errno = EPROTO;
+		goto error2;
 	}
 
+	if (mkdirat(dir_fd1, rand2, 0711) < 0)
+		goto error2;
+
+	fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if (fd < 0 ||
+	    bind(fd, (struct sockaddr *)&client_un, sizeof (client_un)) < 0)
+		goto error3;
+
+	/* Allow chronyd running under a different user to send responses to
+	   our socket. Access to the socket is protected by the directory. */
+
+	if (chmod(client_un.sun_path, 0666) < 0 ||
+	    chmod(dir2, 0711) < 0 ||
+	    fchmod(dir_fd1, 0711) < 0)
+		goto error4;
+
+	if (connect(fd, (struct sockaddr *)&server_un, sizeof (server_un)) < 0)
+		goto error4;
+
+	close(dir_fd1);
+
 	return fd;
+
+error4:
+	unlink(client_un.sun_path);
+error3:
+	rmdir(dir2);
+error2:
+	rmdir(dir1);
+error1:
+	if (fd >= 0)
+		close(fd);
+	if (dir_fd1 >= 0)
+		close(dir_fd1);
+	return -1;
 }
 
 static int open_inet_socket(const char *address) {
