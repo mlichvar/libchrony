@@ -388,11 +388,14 @@ const char *get_field_constant_name(const Message *msg, int field, uint64_t valu
 }
 
 int get_report_index(const char *name) {
+	const char *rep_name;
 	int i;
 
-	for (i = 0; i < chrony_get_number_supported_reports(); i++)
-		if (strcmp(chrony_get_report_name(i), name) == 0)
+	for (i = 0; i < chrony_get_number_supported_reports(); i++) {
+		rep_name = chrony_get_report_name(i);
+		if (rep_name && strcmp(rep_name, name) == 0)
 			return i;
+	}
 	return -1;
 }
 
