@@ -5,12 +5,12 @@ INSTALL = install
 LIBTOOL = libtool
 
 name = libchrony
-version = 0.1
+version = 0.2
+lib_version = 0:1:0
 
 libs = -lm
 
 lib = $(name).la
-lib_version = 0:0:0
 
 prefix = /usr/local
 libdir = $(prefix)/lib
