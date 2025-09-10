@@ -1,0 +1,9 @@
+= libchrony news
+
+== 0.2 (2025-09-10)
+
+* Hide client socket to mitigate unsafe permissions change
+
+== 0.1 (2025-02-25)
+
+* First release
